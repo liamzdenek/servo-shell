@@ -179,6 +179,15 @@ window.onload = function() {
         throw "Unable to find active tab!";
     }
 
+    getTabWithVisibleLabel = function() {
+        for (var i=0; i < g_Tabs.length; ++i) {
+            if(!g_Tabs[i].label.classList.contains("hidden")) {
+                return g_Tabs[i];
+            }
+        }
+        throw "Unable to find visible tab!";
+    }
+
     removeTab = function(tab) {
         var index = g_Tabs.indexOf(tab);
         if (index === -1) {
@@ -250,11 +259,15 @@ window.onload = function() {
     calcMaxTabs = function() {
         // TODO: replace with document.width once it exists
         windowWidth = document.getElementsByTagName("body")[0].getBoundingClientRect().width;
-        
-        // magic numbers, i know. this is supposed to be:
-        // width of the window, minus the width of the buttons that are always visible (new tab)
-        // divided by the width of an individual tab
-        return Math.floor((windowWidth - 80) / 158)
+       
+        tabWidth = getTabWithVisibleLabel().label.getBoundingClientRect().width;
+
+        menuWidth = document.getElementById("new-tab").getBoundingClientRect().width * 3; // *3 to account for the other two buttons... hack, i know.
+
+        r = Math.floor((windowWidth - menuWidth) / tabWidth);
+        return r == 0 ?
+            1 : // never show less than 1 tab
+            r;
     }
 
     prevSet = function() {
